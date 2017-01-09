@@ -33,12 +33,12 @@ enum Orientation: Int, CustomStringConvertible {
     }
     
     static func rotate(orientation: Orientation, clockWise: Bool) -> Orientation {
-        var temp = clockWise ? 1 : -1
-        var rotated = Orientation.RawValue + temp
+        let temp = clockWise ? 1 : -1
+        var rotated = orientation.rawValue + temp
         if rotated > Orientation.TwoSeventy.rawValue {
-            rotated = Orientation.Zero
+            rotated = Orientation.Zero.rawValue
         } else if rotated < 0 {
-            rotated = Orientation.TwoSeventy
+            rotated = Orientation.TwoSeventy.rawValue
         }
         return Orientation(rawValue: rotated)!
     }
@@ -94,8 +94,21 @@ class Shape: Hashable, CustomStringConvertible {
         self.color = color
         self.orientation = orientation
         
+        initializeBlocks()
     }
     
+    func initializeBlocks() {
+        guard let blockRowColumnTranslations = blockRowColumnPositions[orientation] else {
+            return
+        }
+        
+        blocks = blockRowColumnTranslations.map({ (dif) -> Block in
+            return Block(column: column + dif.columnDiff,
+                         row: row + dif.rowDiff,
+                         color: color)
+        })
+        
+    }
     convenience init(column: Int, row: Int) {
         self.init(column: column, row: row, color: BlockColor.random(), orientation: Orientation.random())
     }
